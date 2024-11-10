@@ -1,0 +1,47 @@
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Dd]ist/
+[Dd]ebug/          # Diretório de builds
+[Dd]ebugPublic/    # Builds públicos
+[Dd]ist/            # Diretório de distribuição
+x64/
+x86/
+[Aa]rchive/
+
+# .NET Core
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# User-specific files
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Windows Installer files
+*.cab
+*.msi
+*.msm
+*.msp
+
+# Windows Installer files
+Thumbs.db
+
+# .NET Core-specific
+.vsconfig
+# .NET's runtime folder
+bin/
+obj/
+# arquivos de configuração de ambiente
+global.json
+
+# ASP.NET
+# Arquivos temporários
+*.[Cc]ache
+*.bak
+*.tmp
