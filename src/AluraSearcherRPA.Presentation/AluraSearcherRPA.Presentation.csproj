@@ -1,13 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
+	<ItemGroup>
+	  <PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="130.0.6723.11600" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\AluraSearcherRPA.Application\AluraSearcherRPA.Application.csproj" />
+		<ProjectReference Include="..\AluraSearcherRPA.DependencyInjection\AluraSearcherRPA.DependencyInjection.csproj" />
+	</ItemGroup>
 
 </Project>

@@ -7,13 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Selenium.Support" Version="4.26.1" />
-    <PackageReference Include="Selenium.WebDriver" Version="4.26.1" />
+    <PackageReference Include="AutoMapper" Version="13.0.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AluraSearcherRPA.Domain\AluraSearcherRPA.Domain.csproj" />
     <ProjectReference Include="..\AluraSearcherRPA.Infrastructure\AluraSearcherRPA.Infrastructure.csproj" />
+    <ProjectReference Include="..\AluraSearcherRPA.RPA\AluraSearcherRPA.RPA.csproj" />
   </ItemGroup>
 
 </Project>

@@ -3,15 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.10.34928.147
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AluraSearcherRPA.Presentation", "AluraSearcherRPA.Presentation\AluraSearcherRPA.Presentation.csproj", "{EE7BBED6-47FB-4C86-A3A4-FB7FA13A06D6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AluraSearcherRPA.Presentation", "AluraSearcherRPA.Presentation\AluraSearcherRPA.Presentation.csproj", "{EE7BBED6-47FB-4C86-A3A4-FB7FA13A06D6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AluraSearcherRPA.RPA", "AluraSearcherRPA.RPA\AluraSearcherRPA.RPA.csproj", "{F81A444F-7ACF-4589-B494-E8DC346E1BA9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AluraSearcherRPA.RPA", "AluraSearcherRPA.RPA\AluraSearcherRPA.RPA.csproj", "{F81A444F-7ACF-4589-B494-E8DC346E1BA9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AluraSearcherRPA.Domain", "AluraSearcherRPA.Domain\AluraSearcherRPA.Domain.csproj", "{7E2C7246-8637-4195-BDCE-BF007AC99624}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AluraSearcherRPA.Domain", "AluraSearcherRPA.Domain\AluraSearcherRPA.Domain.csproj", "{7E2C7246-8637-4195-BDCE-BF007AC99624}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AluraSearcherRPA.Infrastructure", "AluraSearcherRPA.Infrastructure\AluraSearcherRPA.Infrastructure.csproj", "{9FA5261D-7A93-486D-A3FC-8534C84033EC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AluraSearcherRPA.Infrastructure", "AluraSearcherRPA.Infrastructure\AluraSearcherRPA.Infrastructure.csproj", "{9FA5261D-7A93-486D-A3FC-8534C84033EC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AluraSearcherRPA.DependencyInjection", "AluraSearcherRPA.DependencyInjection\AluraSearcherRPA.DependencyInjection.csproj", "{7359FA96-D492-4BEC-A629-5628843DCE2D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AluraSearcherRPA.DependencyInjection", "AluraSearcherRPA.DependencyInjection\AluraSearcherRPA.DependencyInjection.csproj", "{7359FA96-D492-4BEC-A629-5628843DCE2D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AluraSearcherRPA.Application", "AluraSearcherRPA.Application\AluraSearcherRPA.Application.csproj", "{C758C8A4-33C0-4C8B-9989-81A237896864}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{7359FA96-D492-4BEC-A629-5628843DCE2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7359FA96-D492-4BEC-A629-5628843DCE2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7359FA96-D492-4BEC-A629-5628843DCE2D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C758C8A4-33C0-4C8B-9989-81A237896864}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C758C8A4-33C0-4C8B-9989-81A237896864}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C758C8A4-33C0-4C8B-9989-81A237896864}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C758C8A4-33C0-4C8B-9989-81A237896864}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
