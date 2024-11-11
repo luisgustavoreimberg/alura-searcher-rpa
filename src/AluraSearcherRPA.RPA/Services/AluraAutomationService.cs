@@ -1,29 +1,77 @@
-﻿using AluraSearcherRPA.Domain.ValueObjects;
+﻿using AluraSearcherRPA.Domain.DTOs;
+using AluraSearcherRPA.Domain.Entities;
+using AluraSearcherRPA.Infrastructure.Logger;
+using AluraSearcherRPA.RPA.DTOs;
 using AluraSearcherRPA.RPA.Extensions;
 using AluraSearcherRPA.RPA.Interfaces;
+using AluraSearcherRPA.RPA.PageElements;
 using AluraSearcherRPA.RPA.Utils;
 using OpenQA.Selenium;
+using Serilog.Core;
 
 namespace AluraSearcherRPA.RPA.Services
 {
     public class AluraAutomationService : IAutomationService
     {
+        private readonly string _chromeDriverPath;
         private IWebDriver? driver;
 
-        public IEnumerable<CourseInfo> ExecuteAutomationProcess(string valueToSearch)
+        private string _currentProcess = "Inicialização do processo";
+        private string currentProcess
         {
-            var response = new List<CourseInfo>();
-
-            using (driver = DriverUtils.StartChromeDriver(@"C:\_WORKSPACE\_DRIVER"))
+            get
             {
-                FillSearchField(valueToSearch);
+                return _currentProcess;
+            }
+            set
+            {
+                Log.Debug($"Processo atual: {value}");
+                _currentProcess = value;
+            }
+        }
 
-                if (CountResults() > 0)
+        public AluraAutomationService(string chromeDriverPath)
+        {
+            _chromeDriverPath = chromeDriverPath;
+        }
+
+        public AutomationSearchResponseDTO ExecuteAutomationProcess(string valueToSearch)
+        {
+            var response = new AutomationSearchResponseDTO();
+
+            try
+            {
+                using (driver = DriverUtils.StartChromeDriver(_chromeDriverPath))
                 {
-                    FilterResults();
+                    if (driver is null)
+                        throw new Exception("Error to initialize driver");
 
-                    response = GetResults();
+                    FillSearchField(valueToSearch);
+
+                    if (CountResults() > 0)
+                    {
+                        FilterResults();
+
+                        var courseData = GetResults();
+                        response.FoundData = courseData;
+                    }
                 }
+            }
+            catch (Exception ex) when (ex is NoSuchElementException || ex is WebDriverTimeoutException)
+            {
+                Log.Error("Elemento não encontrado no site", ex);
+                driver.TakeScreenshot();
+
+                response.Error = true;
+                response.Message = $"Erro no processo da automação: {ex.Message}";
+            }
+            catch (Exception ex)
+            {
+                Log.Error("Erro fatal no processo da automação", ex);
+                driver.TakeScreenshot();
+
+                response.Error = true;
+                response.Message = $"Erro no processo da automação: {ex.Message}";
             }
 
             return response;
@@ -31,19 +79,33 @@ namespace AluraSearcherRPA.RPA.Services
 
         private void FillSearchField(string valueToSearch)
         {
+            currentProcess = "Navegação para busca do curso";
+
             driver.Navigate().GoToUrl("https://www.alura.com.br/");
             driver.WaitPageLoad();
 
-            driver.GetElement(AluraHomePageElements.SearchField).SendKeys(valueToSearch + Keys.Enter);
+            try
+            {
+                driver.GetElement(AluraHomePageElements.SearchField).SendKeys(valueToSearch + Keys.Enter);
+            }
+            catch (Exception ex) when (ex is NoSuchElementException || ex is WebDriverTimeoutException)
+            {
+                Log.Warn("Search field not found on home page, trying to get field from results page");
+                driver.GetElement(AluraResultsPageElements.SearchField).SendKeys(valueToSearch + Keys.Enter);
+            }
             driver.WaitPageLoad();
             driver.WaitPageLoadByLoadingElement(AluraResultsPageElements.SearchLoadingElement);
         }
         private int CountResults()
         {
+            currentProcess = "Contagem dos resultados";
+
             return driver.FindElements(AluraResultsPageElements.ResultCard).Count();
         }
         private void FilterResults()
         {
+            currentProcess = "Filtragem dos resultados";
+
             try
             {
                 driver.GetElement(AluraResultsPageElements.CourseFilterItem, 0).Click();
@@ -51,6 +113,7 @@ namespace AluraSearcherRPA.RPA.Services
             catch
             {
                 driver.GetElement(AluraResultsPageElements.FilterOpener).Click();
+                Thread.Sleep(2000);
                 driver.GetElement(AluraResultsPageElements.CourseFilterItem).Click();
             }
 
@@ -58,35 +121,53 @@ namespace AluraSearcherRPA.RPA.Services
             driver.WaitPageLoad();
             driver.WaitPageLoadByLoadingElement(AluraResultsPageElements.SearchLoadingElement);
         }
-        private List<CourseInfo> GetResults()
+        private List<CourseDataDTO> GetResults(bool justFirstPage = true)
         {
-            var results = new List<SearchResult>();
+            currentProcess = "Captura dos resultados";
 
-            foreach (var resultCard in driver.FindElements(AluraResultsPageElements.ResultCard))
+            var results = new List<CourseDataDTO>();
+
+            do
             {
-                var searchResult = GetResultInfo(resultCard);
+                var resultCards = driver.FindElements(AluraResultsPageElements.ResultCard);
+                for (int i = 0; i < resultCards.Count; i++)
+                {
+                    try
+                    {
+                        var searchResult = GetResultInfo(resultCards[i]);
 
-                if (searchResult != null)
-                    results.Add(searchResult);
-
-                driver.Navigate().Back();
-                driver.WaitPageLoad();
-            }
+                        if (searchResult != null)
+                            results.Add(searchResult);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error($"Error to get info detail: course {i}", ex);
+                        driver.TakeScreenshot();
+                    }
+                    finally
+                    {
+                        driver.Navigate().Back();
+                        driver.WaitPageLoad();
+                    }
+                }
+            } while (!justFirstPage && NavigateToNextPage());
 
             return results;
         }
-        private CourseInfo GetResultInfo(IWebElement resultCard)
+        private CourseDataDTO GetResultInfo(IWebElement resultCard)
         {
-            var title = resultCard.FindElement(AluraResultDetailPageElements.CourseTitle).Text;
-            var description = resultCard.FindElement(AluraResultDetailPageElements.CourseDescription).Text;
+            currentProcess = "Captura dos detalhes do resultado";
+
+            var title = TryGetCourseInfo(resultCard, AluraResultDetailPageElements.CourseTitle, "Course title", true);
+            var description = TryGetCourseInfo(resultCard, AluraResultDetailPageElements.CourseDescription, "Course description");
 
             resultCard.Click();
             driver.WaitPageLoad();
 
-            var instructor = driver.GetElement(AluraResultDetailPageElements.MainInstructorName).Text;
-            var duration = driver.GetElement(AluraResultDetailPageElements.CourseDuration).Text;
+            var instructor = TryGetCourseInfo(driver, AluraResultDetailPageElements.MainInstructorName, "Course instructor");
+            var duration = TryGetCourseInfo(driver, AluraResultDetailPageElements.CourseDuration, "Course duration");
 
-            return new SearchResult
+            return new CourseDataDTO
             {
                 Title = title,
                 Description = description,
@@ -96,6 +177,8 @@ namespace AluraSearcherRPA.RPA.Services
         }
         private bool NavigateToNextPage()
         {
+            currentProcess = "Navegação para a próxima página";
+
             try
             {
                 var lastPageResultText = driver.FindElements(AluraResultsPageElements.ResultCard).FirstOrDefault()?.Text;
@@ -113,6 +196,30 @@ namespace AluraSearcherRPA.RPA.Services
             catch
             {
                 return false;
+            }
+        }
+        private string TryGetCourseInfo<T>(T searchBaseElem, By infoElementIdentifier, string infoDescription = "", bool requiredInfo = false)
+        {
+            try
+            {
+                var courseInfo = string.Empty;
+
+                if (searchBaseElem is IWebElement element)
+                    courseInfo = element.FindElement(infoElementIdentifier).Text;
+                else if (searchBaseElem is IWebDriver driver)
+                    courseInfo = driver.FindElement(infoElementIdentifier).Text;
+
+                ArgumentNullException.ThrowIfNull(courseInfo);
+                return courseInfo;
+            }
+            catch (Exception ex)
+            {
+                Log.Warn($"Unable to get course info({infoDescription}): {ex.Message}");
+
+                if (requiredInfo)
+                    throw ex;
+                else
+                    return string.Empty;
             }
         }
     }

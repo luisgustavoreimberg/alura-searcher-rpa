@@ -1,28 +1,46 @@
 ﻿using AluraSearcherRPA.Application.DTOs;
 using AluraSearcherRPA.Application.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using AluraSearcherRPA.Infrastructure.Interfaces;
+using AutoMapper;
 
 namespace AluraSearcherRPA.Application.Services
 {
     public class HistoryService : IHistoryService
     {
-        public IEnumerable<HistoryResponseDTO> GetAllHistory()
+        private readonly ISearchRepository _searchRepository;
+        private readonly IMapper _mapper;
+
+        public HistoryService(ISearchRepository searchRepository, IMapper mapper)
         {
-            throw new NotImplementedException();
+            _searchRepository = searchRepository;
+            _mapper = mapper;
         }
 
-        public HistoryResponseDTO GetHistory(int id)
+        public IEnumerable<HistoryResponseDTO> GetAllHistory()
         {
-            throw new NotImplementedException();
+            var response = new List<HistoryResponseDTO>();
+            var historyResponseData = _searchRepository.SelectAll();
+
+            if (historyResponseData != null && historyResponseData.Count() > 0)
+                response = historyResponseData.Select(data => _mapper.Map<HistoryResponseDTO>(data)).ToList();
+
+            return response;
+        }
+
+        public HistoryResponseDTO GetHistory(long id)
+        {
+            return _mapper.Map<HistoryResponseDTO>(_searchRepository.SelectById(id));
         }
 
         public IEnumerable<HistoryResponseDTO> GetHistory(string searchedValue)
         {
-            throw new NotImplementedException();
+            var response = new List<HistoryResponseDTO>();
+            var historyResponseData = _searchRepository.SelectBySearchValue(searchedValue);
+
+            if (historyResponseData != null && historyResponseData.Count() > 0)
+                response = historyResponseData.Select(data => _mapper.Map<HistoryResponseDTO>(data)).ToList();
+
+            return response;
         }
     }
 }

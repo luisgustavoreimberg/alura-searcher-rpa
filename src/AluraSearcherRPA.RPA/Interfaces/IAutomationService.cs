@@ -1,9 +1,9 @@
-﻿using AluraSearcherRPA.Domain.ValueObjects;
+﻿using AluraSearcherRPA.RPA.DTOs;
 
 namespace AluraSearcherRPA.RPA.Interfaces
 {
     public interface IAutomationService
     {
-        IEnumerable<CourseInfo> ExecuteAutomationProcess(string valueToSearch);
+        AutomationSearchResponseDTO ExecuteAutomationProcess(string valueToSearch);
     }
 }

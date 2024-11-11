@@ -1,9 +1,9 @@
-﻿using AluraSearcherRPA.Application.DTOs;
+﻿using AluraSearcherRPA.RPA.DTOs;
 
 namespace AluraSearcherRPA.Application.Interfaces
 {
     public interface ISearchService
     {
-        IEnumerable<SearchResponseDTO> ExecuteSearch();
+        AutomationSearchResponseDTO ExecuteSearch(string valueToSearch);
     }
 }

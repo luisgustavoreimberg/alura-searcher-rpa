@@ -1,17 +1,36 @@
-var builder = WebApplication.CreateBuilder(args);
+using AluraSearcherRPA.Application.Middlewares;
+using AluraSearcherRPA.DependencyInjection;
+using AluraSearcherRPA.Infrastructure.Logger;
 
-// Add services to the container.
+try
+{
+    var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+    var connectionString = builder.Configuration.GetConnectionString("DbConnection");
+    ArgumentNullException.ThrowIfNull("Connection String");
 
-var app = builder.Build();
+    var chromeDriverPath = builder.Configuration.GetValue<string>("WebdriverPath");
 
-// Configure the HTTP request pipeline.
+    // Add services to the container.
+    builder.Services.AddControllers();
+    builder.Services.ConfigureSwagger();
+    builder.Services.ConfigureServices(chromeDriverPath);
+    builder.Services.ConfigureDatabase(connectionString);
 
-app.UseHttpsRedirection();
+    var app = builder.Build();
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseSwagger();
+        app.UseSwaggerUI();
+    }
 
-app.UseAuthorization();
-
-app.MapControllers();
-
-app.Run();
+    app.UseMiddleware<ExceptionMiddleware>();
+    app.UseHttpsRedirection();
+    app.UseAuthorization();
+    app.MapControllers();
+    app.Run();
+}
+catch (Exception ex)
+{
+    Log.Error("Erro na inicialização da aplicação", ex);
+}

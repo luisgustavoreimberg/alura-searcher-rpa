@@ -6,4 +6,13 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="13.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AluraSearcherRPA.Infrastructure\AluraSearcherRPA.Infrastructure.csproj" />
+    <ProjectReference Include="..\AluraSearcherRPA.RPA\AluraSearcherRPA.RPA.csproj" />
+  </ItemGroup>
+
 </Project>

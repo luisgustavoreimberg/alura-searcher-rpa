@@ -1,10 +1,6 @@
-﻿using OpenQA.Selenium.Support.UI;
+﻿using AluraSearcherRPA.Infrastructure.Logger;
 using OpenQA.Selenium;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using OpenQA.Selenium.Support.UI;
 
 namespace AluraSearcherRPA.RPA.Extensions
 {
@@ -44,6 +40,21 @@ namespace AluraSearcherRPA.RPA.Extensions
             new WebDriverWait(driver, TimeSpan.FromSeconds(timeoutInSeconds)).Until(d => foundElement.Displayed);
 
             return foundElement;
+        }
+        public static void TakeScreenshot(this IWebDriver driver, string fileName = "screenshot")
+        {
+            try
+            {
+                ArgumentNullException.ThrowIfNull(driver);
+                var fileCompleteName = Path.Combine("Prints", $"{DateTime.Now.ToString("yyyyMMddHHmmssfff")}_{fileName}.png");
+                var screenshot = (driver as ITakesScreenshot).GetScreenshot();
+                screenshot.SaveAsFile(fileName);
+                Log.Info($"Screenshot saved on {fileCompleteName}");
+            }
+            catch (Exception ex)
+            {
+                Log.Warn("Error to take screenshot", ex);
+            }
         }
         public static void Dispose(this IWebDriver driver)
         {
